@@ -1,4 +1,7 @@
 ---
-title: 🎉 Easily create your own simple yet highly customizable blog
-summary: Take full control of your personal brand and privacy by migrating away from the big tech platforms!
-date: 2023-10-27
+title: My Blog Post Title
+date: 2024-09-05
+description: This is a sample blog post.
+---
+
+This is the content of your blog post.
