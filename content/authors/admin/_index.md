@@ -8,7 +8,7 @@ last_name: Al-Shater
 
 # Status emoji
 status:
-  icon: ☕️
+  icon: 🆒
 
 # Is this the primary user of the site?
 superuser: true
@@ -30,16 +30,8 @@ profiles:
   - icon: at-symbol
     url: 'mailto:hani.alshater@gmail.com'
     label: E-mail Me
-  - icon: brands/x
-    url: https://twitter.com/GetResearchDev
-  - icon: brands/instagram
-    url: https://www.instagram.com/
   - icon: brands/linkedin
-    url: https://www.linkedin.com/
-  # Link to a PDF of your resume/CV - upload it to `static/uploads/resume.pdf`
-  - icon: academicons/cv
-    url: uploads/resume.pdf
-    label: Download my resume
+    url: https://www.linkedin.com/in/alshater/
   - icon: rss
     url: ./post/index.xml
     label: Subscribe to my blog via RSS feed
@@ -48,9 +40,11 @@ profiles:
 highlight_name: true
 
 # Author's website URL
-website: ""
+website: "https://hanialshater.github.io/"
 ---
 
-Chien Shiung Wu is a professor of artificial intelligence at the Stanford AI Lab. Her research interests include
-distributed robotics, mobile computing and programmable matter. She leads the Robotic Neurobiology group, which develops
-self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
+Hi there! I’m Hani and I build cool products with AI. I’ve been working in the tech industry for over a decade, and I’m passionate about using artificial intelligence to solve real-world problems and building user experiance. 
+
+I’ve had the opportunity to lead teams of talented engineers and scientists, and together we’ve built products that have impacted hundreds of millions of people. I love the challenge of turning complex ideas into simple, intuitive solutions that make a difference.
+
+Whether I’m working on a new recommendation ideas or developing a cutting-edge natural language processing model, I’m always looking for ways to push the boundaries of what’s possible with AI and a better way to interact with it. I’m always on the lookout for opportunities to prototype new concepts and bring innovative products to life.
