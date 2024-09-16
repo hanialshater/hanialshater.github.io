@@ -76,42 +76,87 @@ Final Verdict: Screenshot 2 offers the best overall UX due to its engaging desig
 As you can see, the LLM judge provides good explanations and detailed evaluation based on the background knowladge it gain from the webscale training data. Now that we got the teaser, lets talk about some cool use-cases for using this evaluation methodology.
 
 
-### LLM-as-a-judge patterns
-#### Accelerate innovation (befoer you go to AB testing)
-A/B testing is the defacto experimentation method every one use to evaluate if a feature A is better than feature B. It involves randomly dividing users into two groups and showing each group a different version. By analyzing the results, you can make data-driven decisions about which version is more effective. Usualy, people rely on p-values or baysian analysis to report the statistical significance of the gain of featuer A compared to featuer B. 
+### LLM-as-a-judge for UX experimentatation
+#### Accelerate innovation with subjective metrics 
+Now, let's imagine you're working on a travel suggestions app. You're considering two new features: adding a search bar or implementing filters for specific interests like "sightseeing" or "nature." Traditionally, you'd build both, run an A/B test, and see which performs better based on metrics like time spent, conversions (saving a place), or revenue.
 
-A/B testing, while a powerful tool for evaluating different versions of a feature, is not without its limitations. While p-values and Bayesian analysis offer statistical insights, they may not always provide a complete picture.
+However, this standard approach is costly and time-consuming. Developing both features requires significant resources, and achieving statistically significant results often demands a large user base. Even if your A/B test shows a positive impact on metrics like revenue or conversions, it doesn't reveal the full picture. You're left in the dark about the long-term effects - will this change lead to user fatigue or churn down the line? And crucially, you won't understand why one feature outperformed the other, hindering your ability to learn and iterate effectively.
 
-One challenge is the requirement for large sample sizes or significant differences between versions to achieve statistical significance. This can be particularly problematic when evaluating subtle changes or features with smaller impacts. Even when statistical significance is reached, the business impact may be minimal or even negative. For instance, a promotion or marketing campaign might lead to short-term losses but long-term gains from attracting new users.
+This is where LLMs can offer a valuable alternative. They can assess "surrogate features" - metrics closely aligned with your business goals, but often subjective and difficult to measure in traditional A/B tests. These surrogate features, like "ease of discovery" or "relevance of results," are often closer to your core value proposition and better predictors of long-term success than typical behavioral or monetary metrics. Moreover, LLMs can provide these insights without needing a large sample size, making them a powerful tool for early-stage feature evaluation and iteration.
 
-Furthermore, A/B testing doesn't provide a clear explanation for why one version is better than another. While it can identify a winner, it doesn't reveal the underlying reasons for the difference in performance. This can make it difficult to learn from the results and improve future iterations.
+ This would allows to define a utility function like this:
 
-Finally, the effectiveness of a feature can change over time. A version that performs well in an A/B test might have negative consequences in the long run. For example, a feature that initially increases user engagement could lead to product fatigue or decreased user satisfaction over time.
+  $Utility = Ease of Discovery * Repeated Sessions * Value of Discovery$
 
-To illustrate these challenges, let's consider a hypothetical example:
+Instead of building both a search bar and filters, you can leverage an LLM to assess  based on key metrics. For instance, the LLM can evaluate 1000 screenshots with various inputs and compare the new features (treatments) against the existing interface (control) to generate a win/tie/loss ratio.
 
-Imagine a travel guide app that introduces a new filtration functionality to allow users to filter destinations based on their interests, such as "sightseeing" or "nature lovers." An A/B test could be conducted to compare the performance of the new filtration feature with the existing search functionality.
+| Feature | Ease of Discovery (Win/Tie/Loss) | Repeated Sessions (Win/Tie/Loss) | Value of Discovery (Win/Tie/Loss) |
+|---|---|---|---|
+Search Bar |	50%/30%/20%	| 40%/20%/40%	| 65%/25%/10%
+Filters |	70%/20%/10%	| 30%/30%/40%	| 50%/30%/20%
 
-However, even if the new filtration feature proves to be statistically significant in terms of user engagement or conversions, several questions remain:
+This breakdown highlights the strengths and weaknesses of each feature. Filters excel in making it easy for users to find what they're looking for, while the search bar is better in helping users discover unique and valuable travel options. Both features have a comparable impact on encouraging repeat visits.
 
-- Business impact: Is the increase in user engagement or conversions sufficient to justify the development and maintenance costs of the new feature?
-- Long-term effects: Could the new filtration feature lead to product fatigue or decreased user satisfaction over time?
-- Underlying reasons: What specific aspects of the new filtration feature are driving the improved performance?
+If your primary goal is to make it incredibly easy for users to find relevant travel options, the filters seem like the stronger contender. However, if you're more focused on helping users discover hidden gems and unique experiences they'll truly value, the search bar might be the better choice.
 
-LLM as judge can help accelarating innovation. Instead of relying solely on real-world user data, which can be time-consuming to collect and analyze, LLMs can be trained on extensive datasets of user interactions and feedback. These models can then provide swift evaluations of various feature variations, identifying promising candidates or potential pitfalls before they are deployed to live users. This offline evaluation empowers teams to prioritize experiments more effectively, minimize the risk of releasing suboptimal features, and ultimately expedite the pace of innovation. 
+While you wouldn't completely rely on an LLM judge for your business decisions, this approach offers remarkable advantages: it's developer-friendly, highlighting the pros and cons of different features and providing insights into key subjective metrics. It's also incredibly cost-effective, generating valuable data points even with a modest budget, eliminating the need for months of development just to try out an idea with a real A/B test.
 
-*LLM as judge of supporting experimentation*:
+##### Dynamic evaluation criteria: Adapting to Diverse User Needs and Contexts
 
-Iterate offline, verify using A/B test
+One size rarely fits all, especially when it comes to user experiences. User expectations and needs vary wildly depending on the specific context, and successful software must cater to this diversity. Consider our travel app example: a user planning a trip to Iceland will likely prioritize information about natural landscapes and outdoor activities, while someone heading to New York might be more interested in cultural attractions and urban experiences. Evaluating these vastly different scenarios requires an equally adaptable approach.
+Dynamic evaluation criteria address this need by enabling the LLM-as-a-judge to tailor its assessments based on the specific context and input data. In our travel app example, this means recognizing that a page optimized for Iceland should emphasize different elements than one designed for New York. The LLM can draw upon its vast training data and knowledge base to understand these nuances, providing valuable insights into what users might find relevant and engaging in each specific context.
+By incorporating dynamic evaluation criteria, we empower LLM-as-a-judge systems to go beyond simple comparisons and offer contextually relevant evaluations that truly reflect the diverse needs of users.
+
+Prompt Examples showcasing Dynamic Evaluation Criteria:
+Scenario 1: Travel app page about Iceland
+Prompt:
+
+```text
+You are an AI agent evaluating the user experience (UX) of travel app pages. Given a screenshot, assess its UX based on the context of a user planning a trip to Iceland.
+
+**Key considerations:**
+
+* Highlight information about natural landscapes, outdoor activities, and weather conditions.
+* Prioritize stunning visuals of Iceland's scenery.
+* Include practical information like local tours, transportation options, and safety tips for outdoor adventures. 
+
+**Evaluate the following screenshot:**
+
+[Insert Screenshot of Travel App Page about Iceland]
+```
+
+Scenario 2: Travel app page about New York City
+Prompt:
+
+```text
+You are an AI agent evaluating the user experience (UX) of travel app pages. Given a screenshot, assess its UX based on the context of a user planning a trip to New York City.
+
+**Key considerations:**
+
+* Focus on showcasing iconic landmarks, cultural attractions, and diverse neighborhoods.
+* Emphasize information on transportation options, restaurant recommendations, and nightlife suggestions.
+* Highlight curated itineraries for different interests (e.g., art lovers, foodies, history buffs).
+
+**Evaluate the following screenshot:**
+
+[Insert Screenshot of Travel App Page about New York City]
+```
+
+By providing these context-specific prompts, we guide the LLM-as-a-judge to evaluate each page based on the unique needs and expectations of its intended audience, ensuring a more relevant and accurate assessment.
 
 
-Build gurdrails and large scale automated tests
 
 
-Dynamic evaluation criteria 
+
+#### Iterate offline, verify using A/B test
 
 
-Extract surrogate features
+#### Build gurdrails and large scale automated tests
+
+
+
+
+
 
 
 
