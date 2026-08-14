@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Al-Salt Building 3D</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#c9dbe5;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+#app{position:relative;width:100%;height:100%}canvas{display:block;width:100%;height:100%}
+#ui{position:absolute;top:12px;left:12px;max-width:330px;background:rgba(18,24,28,.88);color:#eef4f6;padding:12px;border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,.22)}
+#ui h1{font-size:16px;margin:0 0 4px}#ui .sub{font-size:11px;color:#b9c7cc;margin-bottom:10px;line-height:1.4}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}button{border:1px solid #52626a;background:#253038;color:#edf4f7;border-radius:8px;padding:7px 6px;font-size:11px;cursor:pointer}button:hover{background:#34434c}
+.row{display:flex;align-items:center;gap:8px;font-size:11px;margin:6px 0}.row label{flex:1}input[type=checkbox]{width:17px;height:17px}input[type=range]{width:120px}
+#legend{position:absolute;right:12px;top:12px;background:rgba(18,24,28,.82);color:white;padding:9px 11px;border-radius:10px;font-size:11px;line-height:1.5;max-width:260px}
+#hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(15,20,24,.78);color:#f2f5f6;padding:7px 11px;border-radius:999px;font-size:11px;white-space:nowrap}
+@media(max-width:760px){#ui{max-width:calc(100vw - 24px);padding:9px}#ui h1{font-size:14px}#legend{display:none}#hint{font-size:10px;bottom:7px}.grid{grid-template-columns:repeat(4,1fr)}button{padding:6px 4px;font-size:10px}}
+</style></head>
+<body><div id="app"><div id="ui"><h1>Al-Salt Building — Interactive 3D</h1><div class="sub">Hosted web version · white Rwaished stone · upper-street entrance · garage below on left sloping street · balconies only on the view side. Site photo background can be added next.</div>
+<div class="grid"><button data-view="front">Front</button><button data-view="view">View side</button><button data-view="left">Slope/Garage</button><button data-view="right">Right</button><button data-view="iso">3D</button><button data-view="top">Top</button><button data-view="doll">Dollhouse</button><button data-view="reset">Reset</button></div>
+<div class="row"><label>Rwaished stone texture</label><input id="stone" type="checkbox" checked></div>
+<div class="row"><label>Actual site background</label><input id="bg" type="checkbox" disabled></div>
+<div class="row"><label>Balconies</label><input id="bal" type="checkbox" checked></div>
+<div class="row"><label>Garage & retaining walls</label><input id="garage" type="checkbox" checked></div>
+<div class="row"><label>Explode floors</label><input id="explode" type="range" min="0" max="2.4" step="0.1" value="0"><span id="ev">0.0m</span></div></div>
+<div id="legend">Front = upper street / GF entrance<br>Left side street slopes down to -1 garage<br>No balconies on front facade<br>Balconies are on the view side</div><div id="hint">Drag to orbit · pinch / wheel to zoom</div></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const app=document.getElementById('app');
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;app.prepend(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xcadbe5);scene.fog=new THREE.Fog(0xcadbe5,70,145);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,300);camera.position.set(31,24,37);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.target.set(0,8,0);controls.maxPolarAngle=Math.PI*.49;controls.minDistance=17;controls.maxDistance=95;
+scene.add(new THREE.HemisphereLight(0xeaf6ff,0x96866f,2.2));const sun=new THREE.DirectionalLight(0xfff4db,3.1);sun.position.set(-25,42,26);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-45;sun.shadow.camera.right=45;sun.shadow.camera.top=45;sun.shadow.camera.bottom=-45;scene.add(sun);
+function stoneTexture(){const c=document.createElement('canvas');c.width=512;c.height=512;const x=c.getContext('2d');x.fillStyle='#f3f0e8';x.fillRect(0,0,512,512);const h=22,w=92;for(let r=0,y=0;y<512;r++,y+=h){const off=(r%2)*w*.5;for(let xx=-off;xx<512;xx+=w){let n=(Math.sin((xx+r*37)*.31)+1)*.5;let v=238+Math.floor(n*10);x.fillStyle=`rgb(${Math.min(252,v+4)},${Math.min(251,v+2)},${Math.min(246,v-2)})`;x.fillRect(xx+1,y+1,w-2,h-2);x.fillStyle='rgba(105,98,86,.08)';for(let k=0;k<4;k++)x.fillRect(xx+8+((k*23+r*11)%70),y+5+((k*7+r)%10),1,1)}x.strokeStyle='rgba(105,99,88,.27)';x.lineWidth=1;x.beginPath();x.moveTo(0,y);x.lineTo(512,y);x.stroke()}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2.5,2.5);t.colorSpace=THREE.SRGBColorSpace;return t}
+const stoneTex=stoneTexture();const mats={stone:new THREE.MeshStandardMaterial({color:0xf6f3eb,map:stoneTex,roughness:.88,metalness:0}),plainStone:new THREE.MeshStandardMaterial({color:0xf4f1e9,roughness:.9}),terrace:new THREE.MeshStandardMaterial({color:0xa6a9aa,roughness:.95}),concrete:new THREE.MeshStandardMaterial({color:0xb9b7b0,roughness:.95}),road:new THREE.MeshStandardMaterial({color:0x65696b,roughness:1}),glass:new THREE.MeshPhysicalMaterial({color:0x6e8996,roughness:.18,metalness:.05,transmission:.18,transparent:true,opacity:.78,depthWrite:true,polygonOffset:true,polygonOffsetFactor:-2}),frame:new THREE.MeshStandardMaterial({color:0x24292c,roughness:.55,metalness:.7}),rail:new THREE.MeshStandardMaterial({color:0x303436,roughness:.6,metalness:.75}),soil:new THREE.MeshStandardMaterial({color:0xb8aa8f,roughness:1}),green:new THREE.MeshStandardMaterial({color:0x496b42,roughness:1})};
+const roots={site:new THREE.Group(),garage:new THREE.Group(),building:new THREE.Group(),balconies:new THREE.Group(),roof:new THREE.Group()};Object.values(roots).forEach(g=>scene.add(g));
+function box(parent,name,w,h,d,x,y,z,mat,rotX=0,rotY=0){const g=new THREE.BoxGeometry(w,h,d);const m=new THREE.Mesh(g,mat);m.name=name;m.position.set(x,y,z);m.rotation.set(rotX,rotY,0);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function rail(parent,x,y,z,w,d){const g=new THREE.Group();for(const zz of [-d/2,d/2])box(g,'rail',w,.05,.05,0,.95,zz,mats.rail);for(const xx of [-w/2,w/2])box(g,'rail',.05,.05,d,xx,.95,0,mats.rail);for(let i=-w/2;i<=w/2;i+=.55)box(g,'rail',.035,.92,.035,i,.48,-d/2,mats.rail);g.position.set(x,y,z);parent.add(g)}
+function windowFront(parent,x,y,z,w=1.8,h=1.55,door=false){const hh=door?2.25:h;const yy=door?y-.28:y;box(parent,'glass',w,hh,.055,x,yy,z,mats.glass);box(parent,'frame',w+.10,.07,.08,x,yy+hh/2,z+.01,mats.frame);box(parent,'frame',w+.10,.07,.08,x,yy-hh/2,z+.01,mats.frame);box(parent,'frame',.07,hh+.10,.08,x-w/2,yy,z+.01,mats.frame);box(parent,'frame',.07,hh+.10,.08,x+w/2,yy,z+.01,mats.frame);box(parent,'mullion',.045,hh,.08,x,yy,z+.012,mats.frame)}
+function windowBack(parent,x,y,z,w=2.0,h=1.8){box(parent,'glass',w,h,.055,x,y,z,mats.glass);box(parent,'frame',w+.08,.065,.08,x,y+h/2,z-.01,mats.frame);box(parent,'frame',w+.08,.065,.08,x,y-h/2,z-.01,mats.frame);box(parent,'frame',.065,h+.08,.08,x-w/2,y,z-.01,mats.frame);box(parent,'frame',.065,h+.08,.08,x+w/2,y,z-.01,mats.frame)}
+const W=24.15,D=14.36,H=2.9,frontZ=D/2,backZ=-D/2;
+box(roots.site,'upper street',34,.24,5,0,5.88,10.7,mats.road);box(roots.site,'front sidewalk',27,.28,2.0,0,5.95,7.95,mats.terrace);
+const slopeAngle=Math.atan((5.8-0.2)/21);box(roots.site,'left sloping street',4,.24,21,-14.0,3.0,0,mats.road,-slopeAngle,0);box(roots.site,'lower apron',12,.24,8,-10.5,.10,-8.8,mats.road);
+box(roots.site,'lower terrain',31,1.2,12,0,-.62,-6,mats.soil);box(roots.site,'upper terrain',31,1.7,6,0,5.0,9.1,mats.soil);
+box(roots.garage,'left retaining wall',.45,3.0,18,-12.6,1.45,-1.2,mats.stone);box(roots.garage,'front retaining wall',25.5,1.25,.42,0,.62,-9.65,mats.stone);
+box(roots.garage,'garage slab',W,.24,D,0,0,0,mats.concrete);box(roots.garage,'garage core',3.4,2.85,4.9,0,1.43,1.0,mats.stone);for(const x of [-9,-5,-1.7,1.7,5,9])for(const z of [-2.3,2.5])box(roots.garage,'garage column',.42,2.85,.42,x,1.43,z,mats.concrete);
+box(roots.garage,'garage back wall',W,2.85,.28,0,1.43,backZ+.14,mats.stone);box(roots.garage,'garage door',.07,2.45,4.3,-W/2-.04,1.25,-3.4,mats.frame,0,Math.PI/2);
+const baseYs=[2.9,5.8,8.7,11.6,14.5];const groups=[];
+baseYs.forEach((base,i)=>{const g=new THREE.Group();g.userData.baseY=base;roots.building.add(g);groups.push(g);box(g,'floor slab',W,.22,D,0,base+.11,0,mats.concrete);box(g,'shell',W,H-.22,D,0,base+H/2,0,mats.stone);
+const cy=base+1.55;windowFront(g,-7.2,cy,frontZ+.032,1.8,1.56,i===1);windowFront(g,-3.75,cy,frontZ+.032,2.0,1.56,false);windowFront(g,3.75,cy,frontZ+.032,2.0,1.56,false);windowFront(g,7.2,cy,frontZ+.032,1.8,1.56,i===1);
+box(g,'central front projection',3.0,H-.18,.48,0,base+H/2,frontZ+.22,mats.stone);windowFront(g,0,cy,frontZ+.49,.78,1.05,false);
+for(const x of [-7.2,7.2]){windowBack(g,x,cy,backZ-.032,2.0,2.08);windowBack(g,x+(x<0?2.6:-2.6),cy,backZ-.032,1.75,1.55)}
+for(const z of [-3.4,1.6,4.6]){const wx=-W/2-.032;box(g,'side glass',.055,1.45,1.55,wx,cy,z,mats.glass,0,Math.PI/2);box(g,'side glass',.055,1.45,1.55,-wx,cy,z,mats.glass,0,Math.PI/2)}});
+box(roots.site,'entrance bridge',4.0,.26,5.0,0,6.0,8.1,mats.terrace);rail(roots.site,0,6.0,8.1,4.0,5.0);box(roots.site,'main entrance door',2.0,2.35,.08,0,7.08,frontZ+.30,mats.frame);
+const balconyLevels=baseYs.map(b=>b+.22);balconyLevels.forEach((y,i)=>{for(const x of [-7.2,7.2]){box(roots.balconies,'cantilever balcony',5.1,.22,1.45,x,y,backZ-.78,mats.terrace);rail(roots.balconies,x,y+.12,backZ-.78,5.1,1.45)}});
+box(roots.site,'left garden terrace',8.6,.32,4.4,-7.0,3.0,-9.3,mats.terrace);box(roots.site,'right garden terrace',8.6,.32,4.4,7.0,3.0,-9.3,mats.terrace);for(const x of [-10,-7.5,-5,5,7.5,10]){box(roots.site,'tree trunk',.18,1.8,.18,x,4.0,-10.3,mats.frame);const crown=new THREE.Mesh(new THREE.SphereGeometry(.7,10,8),mats.green);crown.position.set(x,5.1,-10.3);roots.site.add(crown)}
+box(roots.roof,'roof slab',W,.22,D,0,17.62,0,mats.concrete);box(roots.roof,'roof parapet front',W,1.05,.22,0,18.12,frontZ-.1,mats.stone);box(roots.roof,'roof parapet back',W,1.05,.22,0,18.12,backZ+.1,mats.stone);box(roots.roof,'stair house',4.1,2.8,5.1,0,19.05,1.0,mats.stone);windowFront(roots.roof,0,19.1,3.58,.8,1.1,false);
+for(let i=0;i<10;i++){const x=-8.5+(i%5)*4.25,z=-1.8+Math.floor(i/5)*3.5;const t=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,1.1,16),new THREE.MeshStandardMaterial({color:0xe8e8e5,roughness:.6}));t.position.set(x,18.3,z);t.castShadow=true;roots.roof.add(t)}
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120),new THREE.ShadowMaterial({color:0x000000,opacity:.16}));ground.rotation.x=-Math.PI/2;ground.position.y=-.01;ground.receiveShadow=true;scene.add(ground);
+let photoBg=null;
+const exp=document.getElementById('explode'),ev=document.getElementById('ev');function applyExplode(){const e=+exp.value;ev.textContent=e.toFixed(1)+'m';groups.forEach((g,i)=>g.position.y=i*e);roots.roof.position.y=groups.length*e}exp.oninput=applyExplode;
+document.getElementById('stone').onchange=e=>{groups.forEach(g=>g.traverse(o=>{if(o.isMesh&&(o.material===mats.stone||o.material===mats.plainStone))o.material=e.target.checked?mats.stone:mats.plainStone}));roots.roof.traverse(o=>{if(o.isMesh&&(o.material===mats.stone||o.material===mats.plainStone))o.material=e.target.checked?mats.stone:mats.plainStone})};
+document.getElementById('bg').onchange=e=>{};document.getElementById('bal').onchange=e=>roots.balconies.visible=e.target.checked;document.getElementById('garage').onchange=e=>roots.garage.visible=e.target.checked;
+function view(name){const set=(p,t=[0,8,0])=>{camera.position.set(...p);controls.target.set(...t);controls.update()};if(name==='front')set([0,11,43],[0,9,1]);if(name==='view')set([0,12,-43],[0,9,-1]);if(name==='left')set([-42,11,3],[-2,7,0]);if(name==='right')set([42,11,3],[2,7,0]);if(name==='iso')set([31,24,37],[0,8,0]);if(name==='top')set([0,58,.01],[0,8,0]);if(name==='doll'){roots.roof.visible=false;set([30,34,29],[0,8,0])}if(name==='reset'){roots.roof.visible=true;exp.value=0;applyExplode();set([31,24,37],[0,8,0])}}document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+</script></body></html>
