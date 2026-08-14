@@ -1,3 +1,12 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Al-Salt Building 3D</title><style>html,body{margin:0;height:100%;background:#111;color:#eee;font-family:system-ui}#msg{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center}</style></head><body><div id="msg">Loading Al-Salt 3D model…</div><script>
-(async()=>{try{const parts=await Promise.all([0,1,2].map(i=>fetch(`./v10s/p${i}.txt`,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`chunk ${i}: HTTP ${r.status}`);return r.text()})));const b64=parts.join('');const bin=atob(b64);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);const ds=new DecompressionStream('gzip');const stream=new Blob([bytes]).stream().pipeThrough(ds);const html=await new Response(stream).text();document.open();document.write(html);document.close()}catch(e){document.getElementById('msg').innerHTML='Could not load the 3D model.<br>'+e.message}})();
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Al-Salt Building 3D</title><style>html,body{margin:0;height:100%;background:#111;color:#eee;font-family:system-ui}#msg{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center}</style></head><body><div id="msg">Loading Al-Salt 3D V10…</div><script>
+(async()=>{try{
+ const parts=await Promise.all(['v10s/p0.txt','v10s/p1.txt','v10s/p2.txt'].map(u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(u+' '+r.status);return r.text()})));
+ const b64=parts.join('').replace(/\s+/g,'');
+ const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+ if(!('DecompressionStream' in window)) throw new Error('This browser does not support gzip decompression. Please open in current Chrome/Brave.');
+ const ds=new DecompressionStream('gzip');
+ const html=await new Response(new Blob([raw]).stream().pipeThrough(ds)).text();
+ document.open();document.write(html);document.close();
+}catch(e){document.getElementById('msg').innerHTML='Could not load V10.<br><small>'+e.message+'</small>'}
+})();
 </script></body></html>
